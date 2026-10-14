@@ -7,7 +7,7 @@
 | Link | URL |
 |------|-----|
 | **Web app (GitHub Pages)** | https://prajwalrajjj.github.io/medicine-availability-finder/ |
-| **API (Render)** | https://medicine-availability-api.onrender.com |
+| **API (live)** | https://integrate-nothing-relax-heart.trycloudflare.com |
 | **GitHub repo** | https://github.com/prajwalrajjj/medicine-availability-finder |
 
 The **frontend is live** on GitHub Pages (`gh-pages` branch). The **API** uses [Render](https://render.com) + PostgreSQL via [`render.yaml`](./render.yaml).

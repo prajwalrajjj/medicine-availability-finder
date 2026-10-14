@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "prisma migrate deploy --schema=../db/prisma/schema.prisma && node src/server.js",
+    "start": "node src/server.js",
     "postinstall": "prisma generate --schema=../db/prisma/schema.prisma",
     "dev": "node --watch src/server.js",
     "db:generate": "prisma generate --schema=../db/prisma/schema.prisma",
