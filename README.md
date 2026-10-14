@@ -10,9 +10,11 @@
 | **API (Render)** | https://medicine-availability-api.onrender.com |
 | **GitHub repo** | https://github.com/prajwalrajjj/medicine-availability-finder |
 
-The frontend deploys automatically on every push to `main`. The API and PostgreSQL database run on [Render](https://render.com) via [`render.yaml`](./render.yaml) (free tier; first request after idle may take ~1 minute).
+The **frontend is live** on GitHub Pages (`gh-pages` branch). The **API** uses [Render](https://render.com) + PostgreSQL via [`render.yaml`](./render.yaml).
 
-**Deploy / update cloud backend (one-time):** open [Render Blueprint from this repo](https://dashboard.render.com/select-repo?type=blueprint) → connect GitHub → select `medicine-availability-finder` → Apply.
+**Finish the live demo (one-time, ~5 min):** follow [docs/DEPLOY_RENDER.md](./docs/DEPLOY_RENDER.md) or [open Render Blueprint → select this repo → Apply](https://dashboard.render.com/select-repo?type=blueprint).
+
+Until Render is applied, the site loads but search shows “API offline” because the backend URL is not running yet.
 
 College cloud-computing project: users search for medicines (e.g. Paracetamol), the backend queries a cloud PostgreSQL database, and pharmacies manage inventory with authenticated accounts. The browser title and product name remain **Medicine Availability Finder**.
 
