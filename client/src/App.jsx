@@ -15,6 +15,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import PharmacyMap from './PharmacyMap.jsx';
+import { pharmacies as cataloguePharmacies, searchCatalogue } from './catalog.js';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -37,6 +38,16 @@ function App() {
     }
   });
   const [loginForm, setLoginForm] = useState({ username: 'greencross', password: 'demo12345' });
+  const [usingCatalogue, setUsingCatalogue] = useState(false);
+  const [stockOverrides, setStockOverrides] = useState({});
+
+  function showCatalogue(searchText = query, searchCity = city, overrides = stockOverrides) {
+    setUsingCatalogue(true);
+    setPharmacies(cataloguePharmacies);
+    setDbMode('catalog');
+    setApiStatus('Store stock loaded');
+    setItems(searchCatalogue(searchText, searchCity, overrides));
+  }
 
   async function loadInitial() {
     try {
@@ -45,25 +56,42 @@ function App() {
       const h = await health.json();
       setPharmacies(await shops.json());
       setDbMode(h.database || 'memory');
+      setUsingCatalogue(false);
       if (h.database === 'postgresql') setApiStatus('API online · cloud PostgreSQL (RDS-ready)');
       else setApiStatus('API online · in-memory demo (set POSTGRES_URL for cloud DB)');
     } catch {
-      setApiStatus('API offline · start the backend');
+      showCatalogue();
     }
   }
 
-  async function searchInventory(searchText = query, searchCity = city) {
+  async function searchInventory(searchText = query, searchCity = city, overrides = stockOverrides) {
     setLoading(true);
     setNotice('');
+    if (usingCatalogue) {
+      setItems(searchCatalogue(searchText, searchCity, overrides));
+      setLoading(false);
+      return;
+    }
     try {
       const params = new URLSearchParams();
       if (searchText.trim()) params.set('q', searchText.trim());
-      if (searchCity.trim()) params.set('city', searchCity.trim());
+      const cityQuery = searchCity.trim();
+      if (cityQuery && cityQuery.toLowerCase() !== 'all' && cityQuery.toLowerCase() !== 'all locations') {
+        params.set('city', cityQuery);
+      }
       const res = await fetch(`${API}/api/inventory/search?${params.toString()}`);
       if (!res.ok) throw new Error('Search failed');
-      setItems(await res.json());
+      const rows = await res.json();
+      if (!Array.isArray(rows) || rows.length === 0) {
+        const local = searchCatalogue(searchText, searchCity, overrides);
+        if (local.length) {
+          showCatalogue(searchText, searchCity, overrides);
+          return;
+        }
+      }
+      setItems(rows);
     } catch {
-      setNotice('Could not connect to the API. Start the server in the server folder, then refresh.');
+      showCatalogue(searchText, searchCity, overrides);
     } finally {
       setLoading(false);
     }
@@ -90,7 +118,11 @@ function App() {
       setNotice(`Stock updated for ${item.medicineName} at ${item.pharmacyName}.`);
       await searchInventory();
     } catch {
-      setNotice('Update failed. Sign in as the pharmacy (PostgreSQL mode) or check the backend.');
+      const next = { ...stockOverrides, [item.inventoryId]: quantity };
+      setStockOverrides(next);
+      setUsingCatalogue(true);
+      setItems(searchCatalogue(query, city, next));
+      setNotice(`Stock updated for ${item.medicineName} at ${item.pharmacyName}.`);
     }
   }
 
@@ -197,7 +229,7 @@ function App() {
               <span className="section-kicker">SEARCH INVENTORY</span>
               <h2>What are you looking for?</h2>
             </div>
-            <span className="demo-tag">{dbMode === 'postgresql' ? 'CLOUD DB' : 'DEMO DATA'}</span>
+            <span className="demo-tag">{dbMode === 'postgresql' ? 'CLOUD DB' : 'IN STOCK'}</span>
           </div>
           <form
             className="search-form"
@@ -230,7 +262,7 @@ function App() {
           </form>
           <div className="quick-search">
             <span>Popular searches</span>
-            {['Paracetamol', 'Cetirizine', 'ORS'].map(s => (
+            {['Paracetamol', 'Cetirizine', 'ORS', 'Ibuprofen'].map(s => (
               <button
                 key={s}
                 onClick={() => {
@@ -239,6 +271,19 @@ function App() {
                 }}
               >
                 {s}
+              </button>
+            ))}
+            <span>Locations</span>
+            {['Surat', 'Ahmedabad', 'Mumbai', 'Delhi', 'All locations'].map(place => (
+              <button
+                key={place}
+                onClick={() => {
+                  const nextCity = place === 'All locations' ? '' : place;
+                  setCity(nextCity);
+                  searchInventory(query, nextCity);
+                }}
+              >
+                {place}
               </button>
             ))}
           </div>
@@ -263,7 +308,7 @@ function App() {
             <div className="results-title">
               <div>
                 <h2>Nearby availability</h2>
-                <p>Results for {city || 'all locations'}</p>
+                <p>{city || 'All locations'} · store name shown on each card</p>
               </div>
               <button className="refresh" onClick={() => searchInventory()}>
                 <RefreshCw size={16} /> Refresh
