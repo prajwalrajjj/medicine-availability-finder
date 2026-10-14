@@ -1,5 +1,4 @@
-# Render Blueprint — free-tier demo (API + PostgreSQL + static frontend)
-# After pushing to GitHub: https://dashboard.render.com/select-repo?type=blueprint
+# Render Blueprint — API + PostgreSQL (frontend lives on GitHub Pages)
 services:
   - type: web
     name: medicine-availability-api
@@ -17,17 +16,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: CLIENT_ORIGIN
-        value: https://medicine-availability-finder.onrender.com
-
-  - type: web
-    name: medicine-availability-finder
-    runtime: static
-    plan: free
-    buildCommand: cd client && npm install && npm run build
-    staticPublishPath: client/dist
-    envVars:
-      - key: VITE_API_URL
-        value: https://medicine-availability-api.onrender.com
+        value: https://prajwalrajjj.github.io
 
 databases:
   - name: medicine-db
