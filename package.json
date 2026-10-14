@@ -1,0 +1,12 @@
+{
+  "name": "medicine-availability-finder",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cloud-Based Medicine Availability and Pharmacy Inventory Management System Using AWS",
+  "scripts": {
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "db:generate": "npm run db:generate --prefix server",
+    "db:migrate": "npm run db:migrate --prefix server"
+  }
+}

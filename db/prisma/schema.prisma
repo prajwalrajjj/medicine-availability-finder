@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+model Pharmacy {
+  id        String      @id @default(cuid())
+  legacyId  String?     @unique
+  name      String
+  city      String
+  address   String
+  phone     String      @default("Contact not supplied")
+  email     String?     @unique
+  username  String?     @unique
+  password  String?
+  isOpen    Boolean     @default(true)
+  inventory Inventory[]
+  location  Location?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model Medicine {
+  id        String      @id @default(cuid())
+  legacyId  String?     @unique
+  name      String
+  strength  String
+  form      String
+  inventory Inventory[]
+}
+
+model Inventory {
+  id          String   @id @default(cuid())
+  legacyId    String?  @unique
+  pharmacyId  String
+  medicineId  String
+  quantity    Int
+  lastUpdated DateTime @default(now())
+  pharmacy    Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  medicine    Medicine @relation(fields: [medicineId], references: [id], onDelete: Cascade)
+
+  @@unique([pharmacyId, medicineId])
+}
+
+model Location {
+  latitude   Float
+  longitude  Float
+  pharmacyId String   @unique
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+}

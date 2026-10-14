@@ -1,0 +1,25 @@
+{
+  "name": "medicine-availability-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "prisma migrate deploy --schema=../db/prisma/schema.prisma && node src/server.js",
+    "postinstall": "prisma generate --schema=../db/prisma/schema.prisma",
+    "dev": "node --watch src/server.js",
+    "db:generate": "prisma generate --schema=../db/prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --schema=../db/prisma/schema.prisma",
+    "db:push": "prisma db push --schema=../db/prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.0",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "jose": "^6.1.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.16.0"
+  }
+}

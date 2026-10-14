@@ -1,0 +1,19 @@
+# Optional: trigger after connecting Render to this repo (render.yaml blueprint).
+# Manual one-time setup: https://dashboard.render.com/select-repo?type=blueprint
+name: Verify API health (after Render deploy)
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_url:
+        description: Backend base URL (no trailing slash)
+        required: true
+        default: https://medicine-availability-api.onrender.com
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check /api/health
+        run: |
+          curl -fsS "${{ inputs.api_url }}/api/health"

@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+server/.env
+client/.env
+.DS_Store
+*.log
+_vitamap_ref/
